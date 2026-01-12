@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { FetchNotes } from '@/lib/api';
 import NoteList from '@/components/NoteList/NoteList';
 import SearchBox from '@/components/SearchBox/SearchBox';
@@ -18,6 +18,7 @@ function NotesClient() {
   const { data } = useQuery({
     queryKey: ['notes', search, page, 12],
     queryFn: () => FetchNotes({ search, page, perPage: 12 }),
+    placeholderData: keepPreviousData,
   });
 
   const handlePageChange = ({ selected }: { selected: number }) => {
@@ -58,9 +59,11 @@ function NotesClient() {
         </button>
       </div>
       <NoteList notes={data?.notes || []} />
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <NoteForm onCancel={closeModal} onClose={closeModal} />
-      </Modal>
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={closeModal}>
+          <NoteForm onCancel={closeModal} onClose={closeModal} />
+        </Modal>
+      )}
     </div>
   );
 }
